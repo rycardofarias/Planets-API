@@ -4,7 +4,10 @@ import static common.PlanetConstants.INVALID_PLANET;
 import static common.PlanetConstants.PLANET;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
+
+import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,5 +43,27 @@ public class PlanetServiceTest {
 		when(planetRepository.save(INVALID_PLANET)).thenThrow(RuntimeException.class);
 		
 		assertThatThrownBy (()-> planetService.create(INVALID_PLANET)).isInstanceOf(RuntimeException.class);
+	}
+	
+	@Test
+	public void getPlanet_ByExistingId_ReturnsEmpty() {
+		
+		when(planetRepository.findById(anyLong())).thenReturn(Optional.of(PLANET));
+		
+		Optional<Planet> planet = planetService.findById(1L);
+		
+		assertThat(planet).isNotEmpty();
+		assertThat(planet.get()).isEqualTo(PLANET);
+	}
+	
+	@Test
+	public void getPlanet_ByUnexistingId_ReturnsEmpty() {
+		
+		when(planetRepository.findById(anyLong())).thenReturn(Optional.empty());
+		
+		Optional<Planet> planet = planetService.findById(1L);
+		
+		assertThat(planet).isEmpty();
+	
 	}
 }
