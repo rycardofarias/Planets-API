@@ -3,10 +3,12 @@ package com.example.planetsAPI.services;
 import static common.PlanetConstants.INVALID_PLANET;
 import static common.PlanetConstants.PLANET;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
@@ -100,12 +102,10 @@ public class PlanetServiceTest {
 	@Test
 	public void listPlanets_ReturnsAllPlanets() {
 		
-		List<Planet> planets = new ArrayList<>() {
-			{
-				add(PLANET);
-			}
-		};
+		List<Planet> planets = new ArrayList<>();
 		
+		planets.add(PLANET);
+			
 		Example<Planet> query = QueryBuilder.makeQuery(
 				new Planet(PLANET.getClimate(), PLANET.getTerrain()));
 		
@@ -126,5 +126,19 @@ public class PlanetServiceTest {
 		List<Planet> planet = planetService.findAll(PLANET.getTerrain(), PLANET.getClimate());
 		
 		assertThat(planet).isEmpty();
+	}
+	
+	@Test
+	public void removePlanet_WithExistingId_doesNotThrowAnyException() {
+				
+		assertThatCode(() -> planetService.delete(1L)).doesNotThrowAnyException();
+	}
+	
+	@Test
+	public void removePlanet_WithUnexistingId_doesNotThrowAnyException() {
+		
+		doThrow(new RuntimeException()).when(planetRepository).deleteById(9999L);
+		
+		assertThatThrownBy(() -> planetService.delete(9999L)).isInstanceOf(RuntimeException.class);
 	}
 }
