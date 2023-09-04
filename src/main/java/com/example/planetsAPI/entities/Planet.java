@@ -2,11 +2,14 @@ package com.example.planetsAPI.entities;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.NotEmpty;
+
 import java.io.Serializable;
 
 @Entity
@@ -19,8 +22,16 @@ public class Planet implements Serializable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@NotEmpty
+	@Column(nullable = false)
 	private String name;
+	
+	@NotEmpty
+	@Column(nullable = false)
 	private String climate;
+	
+	@NotEmpty
+	@Column(nullable = false)
 	private String terrain;
 	
 	public Planet() {
