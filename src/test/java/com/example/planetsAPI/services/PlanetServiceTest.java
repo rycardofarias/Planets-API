@@ -1,7 +1,7 @@
 package com.example.planetsAPI.services;
 
-import static common.PlanetConstants.INVALID_PLANET;
-import static common.PlanetConstants.PLANET;
+import static com.example.planetsAPI.common.PlanetConstants.INVALID_PLANET;
+import static com.example.planetsAPI.common.PlanetConstants.PLANET;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

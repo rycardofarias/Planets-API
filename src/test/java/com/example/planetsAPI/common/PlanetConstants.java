@@ -1,4 +1,4 @@
-package common;
+package com.example.planetsAPI.common;
 
 import com.example.planetsAPI.entities.Planet;
 

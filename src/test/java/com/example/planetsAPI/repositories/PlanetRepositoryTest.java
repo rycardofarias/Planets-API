@@ -1,6 +1,6 @@
-package repositories;
+package com.example.planetsAPI.repositories;
 
-import static common.PlanetConstants.PLANET;
+import static com.example.planetsAPI.common.PlanetConstants.PLANET;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -14,8 +14,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import org.springframework.test.context.ContextConfiguration;
 
 import com.example.planetsAPI.PlanetsApiApplication;
-import com.example.planetsAPI.entities.Planet;
-import com.example.planetsAPI.repositories.PlanetRepository;;
+import com.example.planetsAPI.entities.Planet;;
 
 @DataJpaTest
 @ContextConfiguration(classes = {PlanetsApiApplication.class})
@@ -102,4 +101,6 @@ public class PlanetRepositoryTest {
 		
 		assertThat(planetOpt).isEmpty();
 	}
+	
+	
 }

@@ -1,6 +1,6 @@
 package com.example.planetsAPI.controllers;
 
-import static common.PlanetConstants.PLANET;
+import static com.example.planetsAPI.common.PlanetConstants.PLANET;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
