@@ -6,7 +6,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.Optional;
 
-import org.hamcrest.collection.IsEmptyCollection;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +80,25 @@ public class PlanetRepositoryTest {
 	public void getPlanet_ByUnexstingId_ReturnEmpty() {
 		
 		Optional<Planet> planetOpt = planetRepository.findById(1L);
+		
+		assertThat(planetOpt).isEmpty();
+	}
+	
+	@Test
+	public void getPlanet_ByExistingName_ReturnsPlanet() throws Exception {
+
+		Planet planet = testEntityManager.persistFlushFind(PLANET);
+		
+		Optional<Planet> planetOpt = planetRepository.findByName(planet.getName());
+		
+		assertThat(planetOpt).isNotEmpty();
+		assertThat(planetOpt.get()).isEqualTo(planet);
+	}
+	
+	@Test
+	public void getPlanet_ByUnexistingName_ReturnsNotFound() throws Exception {
+		
+		Optional<Planet> planetOpt = planetRepository.findByName("name");
 		
 		assertThat(planetOpt).isEmpty();
 	}
