@@ -1,6 +1,9 @@
 package com.example.planetsAPI.controllers;
 
 import static com.example.planetsAPI.common.PlanetConstants.PLANET;
+import static com.example.planetsAPI.common.PlanetConstants.PLANETS;
+import static com.example.planetsAPI.common.PlanetConstants.TATOOINE;
+import static org.hamcrest.Matchers.hasSize; 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -8,6 +11,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
@@ -103,7 +108,38 @@ public class PlanetControllerTest {
 	
 	@Test
 	public void getPlanet_ByUnexistingName_ReturnsNotFound() throws Exception {
-		mockMvc.perform(get("/planets/name"))
+		mockMvc.perform(get("/planets/name/1"))
 		.andExpect(status().isNotFound());
 	}
+	
+	@Test
+	public void listPlanets_ReturnsFilteredPlanets() throws Exception {
+	    when(planetService.findAll(null, null)).thenReturn(PLANETS);
+	    when(planetService.findAll(TATOOINE.getTerrain(), TATOOINE.getClimate())).thenReturn(List.of(TATOOINE));
+
+	    mockMvc
+	        .perform(
+	            get("/planets"))
+	        .andExpect(status().isOk())
+	        .andExpect(jsonPath("$", hasSize(3)));
+
+	    mockMvc
+	        .perform(
+	            get("/planets?"
+	                + String.format("terrain=%s&climate=%s", TATOOINE.getTerrain(), TATOOINE.getClimate())))
+	        .andExpect(status().isOk())
+	        .andExpect(jsonPath("$", hasSize(1)))
+	        .andExpect(jsonPath("$[0]").value(TATOOINE));
+	  }
+
+	  @Test
+	  public void listPlanets_ReturnsNoPlanets() throws Exception {
+	    when(planetService.findAll(null, null)).thenReturn(Collections.emptyList());
+
+	    mockMvc
+	        .perform(
+	            get("/planets"))
+	        .andExpect(status().isOk())
+	        .andExpect(jsonPath("$", hasSize(0)));
+	  }
 }
