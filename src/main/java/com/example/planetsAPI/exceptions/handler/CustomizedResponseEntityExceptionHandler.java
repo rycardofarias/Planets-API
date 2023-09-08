@@ -1,6 +1,7 @@
 package com.example.planetsAPI.exceptions.handler;
 
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -12,7 +13,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
-public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler{
+public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExceptionHandler {
 
 	@Override
 	protected ResponseEntity<Object> handleMethodArgumentNotValid(MethodArgumentNotValidException ex,
@@ -22,9 +23,16 @@ public class CustomizedResponseEntityExceptionHandler extends ResponseEntityExce
 	}
 	
 	@ExceptionHandler(DataIntegrityViolationException.class)
-	private ResponseEntity<Object> handleConflict(DataIntegrityViolationException ex){
+	private ResponseEntity<Object> handleConflict(DataIntegrityViolationException ex) {
 		
 		return ResponseEntity.status(HttpStatus.CONFLICT)
 				.body(ex.getMessage());
+	}
+	
+	@ExceptionHandler(EmptyResultDataAccessException.class)
+	private ResponseEntity<Object> handleBadResponse(EmptyResultDataAccessException exception) {
+		
+		return ResponseEntity.status(HttpStatus.NOT_FOUND)
+				.body(exception.getMessage());
 	}
 }
