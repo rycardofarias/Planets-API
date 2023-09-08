@@ -3,9 +3,11 @@ package com.example.planetsAPI.controllers;
 import static com.example.planetsAPI.common.PlanetConstants.PLANET;
 import static com.example.planetsAPI.common.PlanetConstants.PLANETS;
 import static com.example.planetsAPI.common.PlanetConstants.TATOOINE;
-import static org.hamcrest.Matchers.hasSize; 
+import static org.hamcrest.Matchers.hasSize;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -20,6 +22,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -44,7 +47,9 @@ public class PlanetControllerTest {
 		
 		when(planetService.create(PLANET)).thenReturn(PLANET);
 		
-		mockMvc.perform(post("/planets")
+		mockMvc
+			.perform(
+				post("/planets")
 			.content(objectMapper.writeValueAsString(PLANET))
 			.contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isCreated())
@@ -57,15 +62,19 @@ public class PlanetControllerTest {
 		Planet emptyPlanet = new Planet();
 		Planet invalidPlanet = new Planet("", "", "");
 		
-		mockMvc.perform(post("/planets")
-				.content(objectMapper.writeValueAsString(emptyPlanet))
-				.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isUnprocessableEntity());
+		mockMvc
+			.perform(
+				post("/planets")
+			.content(objectMapper.writeValueAsString(emptyPlanet))
+			.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isUnprocessableEntity());
 		
-		mockMvc.perform(post("/planets")
-				.content(objectMapper.writeValueAsString(invalidPlanet))
-				.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isUnprocessableEntity());
+		mockMvc
+			.perform(
+				post("/planets")
+			.content(objectMapper.writeValueAsString(invalidPlanet))
+			.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isUnprocessableEntity());
 	}
 	
 	@Test
@@ -73,10 +82,12 @@ public class PlanetControllerTest {
 	
 		when(planetService.create(any())).thenThrow(DataIntegrityViolationException.class);
 		
-		mockMvc.perform(post("/planets")
-				.content(objectMapper.writeValueAsString(PLANET))
-				.contentType(MediaType.APPLICATION_JSON))
-				.andExpect(status().isConflict());
+		mockMvc
+			.perform(
+					post("/planets")
+			.content(objectMapper.writeValueAsString(PLANET))
+			.contentType(MediaType.APPLICATION_JSON))
+			.andExpect(status().isConflict());
 	}
 	
 	@Test
@@ -84,16 +95,20 @@ public class PlanetControllerTest {
 		
 		when(planetService.findById(1L)).thenReturn(Optional.of(PLANET));
 		
-		mockMvc.perform(get("/planets/1"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$").value(PLANET));
+		mockMvc
+			.perform(
+				get("/planets/1"))
+			.andExpect(status().isOk())
+			.andExpect(jsonPath("$").value(PLANET));
 	}
 	
 	@Test
 	public void getPlanet_ByUnexistingId_ReturnsNotFound() throws Exception {
 				
-		mockMvc.perform(get("/planets/1"))
-				.andExpect(status().isNotFound());
+		mockMvc
+			.perform(
+				get("/planets/1"))
+			.andExpect(status().isNotFound());
 	}
 	
 	@Test
@@ -101,15 +116,19 @@ public class PlanetControllerTest {
 
 		when(planetService.findByName(PLANET.getName())).thenReturn(Optional.of(PLANET));
 		
-		mockMvc.perform(get("/planets/name/" + PLANET.getName()))
-				.andExpect(status().isOk())  
-				.andExpect(jsonPath("$").value(PLANET));
+		mockMvc
+			.perform(
+				get("/planets/name/" + PLANET.getName()))
+			.andExpect(status().isOk())  
+			.andExpect(jsonPath("$").value(PLANET));
 	}
 	
 	@Test
 	public void getPlanet_ByUnexistingName_ReturnsNotFound() throws Exception {
-		mockMvc.perform(get("/planets/name/1"))
-		.andExpect(status().isNotFound());
+		mockMvc
+			.perform(
+				get("/planets/name/1"))
+			.andExpect(status().isNotFound());
 	}
 	
 	@Test
@@ -134,12 +153,30 @@ public class PlanetControllerTest {
 
 	  @Test
 	  public void listPlanets_ReturnsNoPlanets() throws Exception {
-	    when(planetService.findAll(null, null)).thenReturn(Collections.emptyList());
+	     when(planetService.findAll(null, null)).thenReturn(Collections.emptyList());
 
-	    mockMvc
-	        .perform(
+	     mockMvc
+	         .perform(
 	            get("/planets"))
-	        .andExpect(status().isOk())
-	        .andExpect(jsonPath("$", hasSize(0)));
+	         .andExpect(status().isOk())
+	         .andExpect(jsonPath("$", hasSize(0)));
+	  }
+	  
+	  @Test
+	  public void removePlanet_WithExistingId_ReturnsNoContent() throws Exception {
+		  
+		  mockMvc
+		  	  .perform(delete("/planets/1"))
+		  	  .andExpect(status().isNoContent());
+	  }
+	  
+	  @Test
+	  public void removePlanet_WithUnexistingId_ReturnsNotFound() throws Exception {
+		  final Long planetId = 1L;
+		  doThrow(new EmptyResultDataAccessException(1)).when(planetService).delete(planetId);
+		  
+		  mockMvc
+		  	  .perform(delete("/planets/" + planetId))
+		  	  .andExpect(status().isNotFound());
 	  }
 }
