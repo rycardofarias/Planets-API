@@ -126,6 +126,15 @@ public class PlanetRepositoryTest {
 	}
 	
 	@Test
+	  public void listPlanets_ReturnsNoPlanets() {
+	    Example<Planet> query = QueryBuilder.makeQuery(new Planet());
+
+	    List<Planet> response = planetRepository.findAll(query);
+
+	    assertThat(response).isEmpty();
+	  }
+	
+	@Test
 	public void removePlanet_WithExistingId_RemovesPlanetFromDatabase() {
 		
 		Planet planet = testEntityManager.persistFlushFind(PLANET);
@@ -135,4 +144,5 @@ public class PlanetRepositoryTest {
 		Planet removedPlanet = testEntityManager.find(Planet.class, planet.getId());
 		assertThat(removedPlanet).isNull();
 	}
+	
 }
