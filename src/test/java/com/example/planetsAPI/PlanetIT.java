@@ -72,10 +72,21 @@ public class PlanetIT {
 	}
 	
 	@Test
-	public void listPlanets_ByTerrain_ReturnsPlanets() {
+	public void listPlanets_ByClimate_ReturnsPlanets() {
 
 		ResponseEntity<Planet[]> planet = restTemplate.getForEntity(
 				"/planets?climate=" + TATOOINE.getClimate(), Planet[].class);
+		
+		assertThat(planet.getStatusCode()).isEqualTo(HttpStatus.OK);
+		assertThat(planet.getBody()).hasSize(1);
+		assertThat(planet.getBody()[0]).isEqualTo(TATOOINE);
+	}
+	
+	@Test
+	public void listPlanets_ByTerrain_ReturnsPlanets() {
+
+		ResponseEntity<Planet[]> planet = restTemplate.getForEntity(
+				"/planets?terrain=" + TATOOINE.getTerrain(), Planet[].class);
 		
 		assertThat(planet.getStatusCode()).isEqualTo(HttpStatus.OK);
 		assertThat(planet.getBody()).hasSize(1);
