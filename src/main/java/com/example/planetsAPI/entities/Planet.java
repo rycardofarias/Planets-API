@@ -1,6 +1,10 @@
 package com.example.planetsAPI.entities;
 
+import java.io.Serializable;
+
 import org.apache.commons.lang3.builder.EqualsBuilder;
+
+import com.example.planetsAPI.jacoco.ExcludeFromJacocoGeneratedReport;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,8 +13,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
-
-import java.io.Serializable;
 
 @Entity
 @Table(name = "planets")
@@ -85,4 +87,10 @@ public class Planet implements Serializable {
 	public boolean equals(Object obj) {
 		return EqualsBuilder.reflectionEquals(obj, this);
 	}
+	
+	@ExcludeFromJacocoGeneratedReport
+    @Override
+    public String toString() {
+      return "Planet [climate=" + climate + ", id=" + id + ", name=" + name + ", terrain=" + terrain + "]";
+    }
 }
